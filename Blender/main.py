@@ -30,11 +30,10 @@ class Google3DTileMaterialFixer(types.Operator):
         counter: int = 0
         if context.object:
             selection = context.selected_objects
-
             for obj in selection:
-                mat: data.materials = obj.active_material
-                mat: data.materials = convert_shader(mat)
-                counter+=1
+                for mat_item in obj.material_slots:
+                    mat: data.materials = convert_shader(mat_item.material)
+                    counter+=1
             print(f"\n\n{counter} 3D Tiles modified.")
 
         return {'FINISHED'}
@@ -44,25 +43,21 @@ def clean_material(mat: data.materials):
 
     mat.use_nodes = True
     # print(f'material name: {mat.name}')
-    if "Material_0." in mat.name:
-        if mat.node_tree:
-            nodes = mat.node_tree.nodes
-            links = mat.node_tree.links
-            # for node in nodes:
-            #     print(node)
-            # for link in links:
-            #     print(link)
-            links.clear()
-            try:
-                nodes.remove(nodes['Emission'])
-                nodes.remove(nodes['Light Path'])
-                nodes.remove(nodes['Transparent BSDF'])
-                nodes.remove(nodes['Mix Shader'])
-            except:
-                # don't raise errors when a node is not found.
-                pass
-    else:
-        raise Exception("One or more selected objects is probably not a Google 3D Tile")
+    if mat.node_tree:
+        nodes = mat.node_tree.nodes
+        links = mat.node_tree.links
+        # for node in nodes:
+        #     print(node)
+        # for link in links:
+        #     print(link)
+        links.clear()
+        try:
+            for node in nodes:
+                if (node.name != "Image Texture" and node.name != "Material Output") and node.label != "BASE COLOR":
+                    nodes.remove(nodes[node.name])
+        except:
+            # don't raise errors when a node is not found.
+            pass
 
     return mat
 
