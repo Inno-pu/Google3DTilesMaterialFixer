@@ -22,7 +22,7 @@ from bpy import data
 
 class Google3DTileMaterialFixer(types.Operator):
     bl_idname = 'test.material_fixer'
-    bl_label = 'Convert materials to Principled BSDFaaaaa'
+    bl_label = 'Convert materials to Principled BSDF'
 
 
     # this gets executed when the user presses the menu button.
@@ -34,7 +34,8 @@ class Google3DTileMaterialFixer(types.Operator):
                 for mat_item in obj.material_slots:
                     mat: data.materials = convert_shader(mat_item.material)
                     counter+=1
-            print(f"\n\n{counter} 3D Tiles modified.")
+            self.report({'INFO'}, f"counter} 3D Tiles modified.")
+            print()
 
         return {'FINISHED'}
 
@@ -42,14 +43,9 @@ class Google3DTileMaterialFixer(types.Operator):
 def clean_material(mat: data.materials):
 
     mat.use_nodes = True
-    # print(f'material name: {mat.name}')
     if mat.node_tree:
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
-        # for node in nodes:
-        #     print(node)
-        # for link in links:
-        #     print(link)
         links.clear()
         try:
             for node in nodes:
@@ -77,7 +73,7 @@ def convert_shader(mat):
         pass
 
     links.new(shader.outputs[0], output.inputs[0])
-    print(f"Fixed {mat.name}.\n")
+    self.report({'INFO'}, f"Fixed {mat.name}.")
     return mat
 
 
