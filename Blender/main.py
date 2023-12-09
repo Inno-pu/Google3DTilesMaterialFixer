@@ -22,7 +22,7 @@ from bpy import data
 
 class Google3DTileMaterialFixer(types.Operator):
     bl_idname = 'test.material_fixer'
-    bl_label = 'Convert materials to Principled BSDF'
+    bl_label = 'Convert materials to Principled BSDFaaaaa'
 
 
     # this gets executed when the user presses the menu button.
@@ -66,13 +66,16 @@ def convert_shader(mat):
     new_mat = clean_material(mat)
     nodes = new_mat.node_tree.nodes
     links = new_mat.node_tree.links
-
-    input = nodes['Image Texture']
     output = nodes['Material Output']
-
     shader = nodes.new(type='ShaderNodeBsdfPrincipled')
+    
+    input = None
+    try:
+        input = nodes['Image Texture']
+        links.new(input.outputs[0], shader.inputs[0])
+    except:
+        pass
 
-    links.new(input.outputs[0], shader.inputs[0])
     links.new(shader.outputs[0], output.inputs[0])
     print(f"Fixed {mat.name}.\n")
     return mat
