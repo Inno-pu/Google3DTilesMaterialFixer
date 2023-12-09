@@ -32,7 +32,7 @@ class Google3DTileMaterialFixer(types.Operator):
             selection = context.selected_objects
             for obj in selection:
                 for mat_item in obj.material_slots:
-                    mat: data.materials = convert_shader(mat_item.material)
+                    mat: data.materials = convert_shader(mat_item.material, self)
                     counter+=1
             self.report({'INFO'}, f"{counter} 3D Tiles modified.")
             print()
@@ -43,14 +43,9 @@ class Google3DTileMaterialFixer(types.Operator):
 def clean_material(mat: data.materials):
 
     mat.use_nodes = True
-    # print(f'material name: {mat.name}')
     if mat.node_tree:
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
-        # for node in nodes:
-        #     print(node)
-        # for link in links:
-        #     print(link)
         links.clear()
         try:
             for node in nodes:
@@ -63,7 +58,7 @@ def clean_material(mat: data.materials):
     return mat
 
 
-def convert_shader(mat):
+def convert_shader(mat, context):
     new_mat = clean_material(mat)
     nodes = new_mat.node_tree.nodes
     links = new_mat.node_tree.links
@@ -78,7 +73,7 @@ def convert_shader(mat):
         pass
 
     links.new(shader.outputs[0], output.inputs[0])
-    self.report({'INFO'}, f"Fixed {mat.name}.")
+    context.report({'INFO'}, f"Fixed {mat.name}.")
     return mat
 
 
